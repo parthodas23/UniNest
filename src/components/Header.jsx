@@ -16,7 +16,7 @@ const Header = () => {
       <div className="bg-white sticky border-b-white shadow-sm x-50 top-0">
         <header className="flex justify-between items-center px-3 max-w-6xl mx-auto">
           <div>
-            <h1 className="cursor-pointer">UniNest</h1>
+            <h1 className="cursor-pointer text-purple-500 font-bold text-xl">🎓UniNest</h1>
           </div>
           <div>
             <ul className=" flex space-x-7">
