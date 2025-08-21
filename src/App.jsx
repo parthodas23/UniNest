@@ -7,6 +7,7 @@ import ListRoom from "./pages/ListRoom";
 import Profile from "./pages/Profile";
 import SingIn from "./pages/SingIn";
 import Header from "./components/Header";
+import { ToastContainer, Bounce } from "react-toastify";
 
 const App = () => {
   return (
@@ -22,6 +23,19 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassward />} />
         </Routes>
       </Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </>
   );
 };

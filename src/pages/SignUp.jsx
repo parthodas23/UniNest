@@ -8,7 +8,9 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { db } from "../firebase";
-import { serverTimestamp, setDoc } from "firebase/firestore";
+import { serverTimestamp, setDoc, doc } from "firebase/firestore";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,7 @@ const SignUp = () => {
 
   const { name, email, password } = formData;
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const onChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
@@ -40,9 +43,11 @@ const SignUp = () => {
       const copyFormData = { ...formData };
       delete copyFormData.password;
       copyFormData.timestamp = serverTimestamp();
-      await setDoc(doc(db, "users", user.uid), copyFormDatagit );
+      await setDoc(doc(db, "users", user.uid), copyFormData);
+      toast.success("Sign Up was successfull");
+      navigate("/");
     } catch (err) {
-      console.log(err);
+      toast.error("Something Went Wrong in registration");
     }
   };
 
@@ -115,7 +120,7 @@ const SignUp = () => {
               className="w-full rounded-2xl py-3 bg-green-400 mt-2 hover:bg-green-500 cursor-pointer active:bg-green-700"
               type="submit"
             >
-              Sign In
+              Sign Up
             </button>
             <div className="flex items-center my-4 before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="text-center font-semibold mx-4">Or</p>
