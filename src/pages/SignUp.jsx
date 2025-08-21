@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { serverTimestamp, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -10,31 +17,53 @@ const SignUp = () => {
     password: "",
   });
 
-  const { email, password } = formData;
+  const { name, email, password } = formData;
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+      const user = userCredential.user;
+      const copyFormData = { ...formData };
+      delete copyFormData.password;
+      copyFormData.timestamp = serverTimestamp();
+      await setDoc(doc(db, "users", user.uid), copyFormDatagit );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <section>
       <h1 className="text-3xl text-center mt-6 font-bold">Sign Up</h1>
-      <div className="flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto">
-        <div className="md:w-[67%] lg:w-[50%] mb-12 md:mb-6">
+      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col lg:flex-row items-center gap-10">
+        <div className="flex-1">
           <img
             className="w-full rounded-2xl"
             src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=780&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt=""
           />
         </div>
-        <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+        <div className="flex-1 lg:ml-10 w-full">
+          <form onSubmit={onSubmit}>
             <input
               className=" mb-6 w-full bg-purple-100 px-4 py-2 text-xl border border-gray-300 rounded"
               type="text"
               placeholder="Full Name"
-              id="text"
+              id="name"
               value={name}
               onChange={onChange}
             />
@@ -78,7 +107,7 @@ const SignUp = () => {
               </p>
               <p>
                 <Link className="text-red-600" to="/forgot-password">
-                  Forgot Password
+                  Forgot Password?
                 </Link>
               </p>
             </div>

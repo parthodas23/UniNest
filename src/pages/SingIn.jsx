@@ -68,7 +68,7 @@ const SingIn = () => {
               </p>
               <p>
                 <Link className="text-red-600" to="/forgot-password">
-                  Forgot Password
+                  Forgot Password?
                 </Link>
               </p>
             </div>
