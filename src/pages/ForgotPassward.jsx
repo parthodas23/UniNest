@@ -1,19 +1,27 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import OAuth from "../components/OAuth";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { toast } from "react-toastify";
 
 const ForgotPassward = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const { email, password } = formData;
-  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState();
 
   const onChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+    setEmail(e.target.value);
+  };
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Email was sent");
+      navigate("/signin");
+    } catch (error) {
+      toast.error("Could not send reset email");
+    }
   };
 
   return (
@@ -28,7 +36,7 @@ const ForgotPassward = () => {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               className=" mb-6 w-full bg-purple-100 px-4 py-2 text-xl border border-gray-300 rounded"
               type="email"
@@ -37,7 +45,7 @@ const ForgotPassward = () => {
               value={email}
               onChange={onChange}
             />
-            
+
             <div className="flex justify-between whitespace-nowrap text-sm sm:text-lg">
               <p>
                 Don't have account?{" "}
@@ -58,7 +66,7 @@ const ForgotPassward = () => {
               className="w-full rounded-2xl py-3 bg-green-400 mt-2 hover:bg-green-500 cursor-pointer active:bg-green-700"
               type="submit"
             >
-              Send Reset Code
+              Send Reset Email
             </button>
             <div className="flex items-center my-4 before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="text-center font-semibold mx-4">Or</p>

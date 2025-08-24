@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router";
 import OAuth from "../components/OAuth";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const SingIn = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -14,6 +18,23 @@ const SingIn = () => {
 
   const onChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredetials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredetials.user) {
+        toast.success("Sign In was Successfull");
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Wrong user credetials");
+    }
   };
 
   return (
@@ -28,7 +49,7 @@ const SingIn = () => {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               className=" mb-6 w-full bg-purple-100 px-4 py-2 text-xl border border-gray-300 rounded"
               type="email"
@@ -43,6 +64,8 @@ const SingIn = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
+                value={password}
+                onChange={onChange}
               />
               {showPassword ? (
                 <FaEyeSlash

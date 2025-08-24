@@ -7,6 +7,7 @@ import ListRoom from "./pages/ListRoom";
 import Profile from "./pages/Profile";
 import SingIn from "./pages/SingIn";
 import Header from "./components/Header";
+import PrivateRoutes from "./components/PrivateRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
 
 const App = () => {
@@ -19,7 +20,9 @@ const App = () => {
           <Route path="/signin" element={<SingIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/list-room" element={<ListRoom />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<PrivateRoutes />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
           <Route path="/forgot-password" element={<ForgotPassward />} />
         </Routes>
       </Router>
