@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { db } from "../firebase";
 const Profile = () => {
+
   const auth = getAuth();
   const [changeDetails, setChangeDetails] = useState(false);
   const navigate = useNavigate();
