@@ -16,18 +16,30 @@ const OAuth = () => {
       const user = result.user;
 
       // check if the user in database or not
-
       const docRef = doc(db, "users", user.uid);
+
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        await setDoc(docRef, {
-          name: user.displayName,
+        await setDoc(doc(db, "users", user.uid), {
           email: user.email,
-          timestamp: serverTimestamp(),
+          university: "",
+          year: "",
+          city: "",
         });
+        // If user profile doesn't exist → setup profile
+        navigate("/setup-profile");
+        return;
       }
-      navigate("/");
+
+      const data = docSnap.data();
+
+      // ✅ Check for missing fields
+      if (!data.university || !data.city || !data.year) {
+        navigate("/setup-profile");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       toast.error("Could not authorised by Google");
       console.log(err);

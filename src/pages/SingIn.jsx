@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 const SingIn = () => {
   const navigate = useNavigate();
@@ -23,17 +25,40 @@ const SingIn = () => {
     e.preventDefault();
     try {
       const auth = getAuth();
-      const userCredetials = await signInWithEmailAndPassword(
+      const userCredentials = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
-      if (userCredetials.user) {
-        toast.success("Sign In was Successfull");
+      const user = userCredentials.user;
+
+      // ✅ FIXED: collection name and uid
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          university: "",
+          year: "",
+          city: "",
+        });
+        // If user profile doesn't exist → setup profile
+        navigate("/setup-profile");
+        return;
+      }
+
+      const data = docSnap.data();
+
+      // ✅ Check for missing fields
+      if (!data.university || !data.city || !data.year) {
+        navigate("/setup-profile");
+      } else {
         navigate("/");
       }
     } catch (error) {
-      toast.error("Wrong user credetials");
+      toast.error("Wrong user credentials");
+      console.error(error);
     }
   };
 
@@ -44,7 +69,7 @@ const SingIn = () => {
         <div className="md:w-[67%] lg:w-[50%] mb-12 md:mb-6">
           <img
             className="w-full rounded-2xl"
-            src="https://plus.unsplash.com/premium_photo-1677527449416-cc4bde191457?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=780&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt=""
           />
         </div>

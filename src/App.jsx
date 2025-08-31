@@ -9,6 +9,7 @@ import SingIn from "./pages/SingIn";
 import Header from "./components/Header";
 import PrivateRoutes from "./components/PrivateRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
+import SetupProfile from "./pages/SetupProfile";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
           </Route>
           <Route path="/forgot-password" element={<ForgotPassward />} />
+          <Route path="/setup-profile" element={<SetupProfile />} />
         </Routes>
       </Router>
       <ToastContainer
