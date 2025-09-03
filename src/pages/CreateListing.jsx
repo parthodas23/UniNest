@@ -13,6 +13,8 @@ const CreateListing = () => {
     description: "",
   });
 
+  const handleSubmit = () => {};
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-2">
       <h2 className="text-2xl font-bold mb-4">Create Listing</h2>
@@ -112,7 +114,7 @@ const CreateListing = () => {
           />
         </div>
         <div>
-          <p className="font-semibold mb-2">Image Upload</p>
+          <p className="font-semibold mb-2">Uploead Image</p>
           <input
             type="file"
             name="image"
@@ -123,6 +125,25 @@ const CreateListing = () => {
             }}
           />
         </div>
+        <div>
+          <p className="font-semibold mb-2">Description</p>
+          <textarea
+            name="description"
+            className="w-full p-2 border rounded-lg "
+            value={formData.description}
+            onChange={(e) => {
+              setFormData({ ...formData, description: e.target.value });
+            }}
+            rows="4"
+          />
+        </div>
+        <button
+          className="w-full bg-green-500 border border-gray-300 p-2 cursor-pointer rounded-lg hover:bg-green-600 text-white"
+          type="submit"
+          onSubmit={handleSubmit}
+        >
+          Submit Listing
+        </button>
       </form>
     </div>
   );
