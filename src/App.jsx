@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import PrivateRoutes from "./components/PrivateRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
 import SetupProfile from "./pages/SetupProfile";
+import CreateListing from "./pages/CreateListing";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
           </Route>
           <Route path="/forgot-password" element={<ForgotPassward />} />
           <Route path="/setup-profile" element={<SetupProfile />} />
+          <Route path="/create-list" element={<CreateListing />} />
         </Routes>
       </Router>
       <ToastContainer

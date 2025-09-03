@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { db } from "../firebase";
 const Profile = () => {
@@ -145,6 +145,13 @@ const Profile = () => {
             </p>
           </div>
         </form>
+
+        <button
+          className="p-2 w-full bg-blue-400 rounded-2xl mt-3 cursor-pointer hover:bg-blue-500"
+          type="submit"
+        >
+          <Link to="/create-list">Find Or Rent Your Home</Link>
+        </button>
       </div>
     </section>
   );
