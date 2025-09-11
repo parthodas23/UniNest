@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import Spinner from "../components/Spinner";
 
 const CreateListing = () => {
+  const [geoLocationEnabled, setGeoLocationEnabled] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     type: "Looking for Room",
@@ -11,9 +14,18 @@ const CreateListing = () => {
     location: "",
     image: null,
     description: "",
+    latitude: 0,
+    longitude: 0,
   });
 
-  const handleSubmit = () => {};
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+  };
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-2">
@@ -76,32 +88,35 @@ const CreateListing = () => {
             required
           />
         </div>
-        <div>
-          <p className="font-semibold mb-2">Bedrooms</p>
-          <input
-            type="number"
-            value={formData.bedrooms}
-            className="w-full p-2 border rounded-lg"
-            onChange={(e) => {
-              setFormData({ ...formData, bedrooms: e.target.value });
-            }}
-            min="1"
-          />
+        <div className="flex space-x-10">
+          {" "}
+          <div>
+            <p className="font-semibold mb-2">Bedrooms</p>
+            <input
+              type="number"
+              value={formData.bedrooms}
+              className="w-full p-2 border rounded-lg"
+              onChange={(e) => {
+                setFormData({ ...formData, bedrooms: e.target.value });
+              }}
+              min="1"
+            />
+          </div>
+          <div>
+            <p className="font-semibold mb-2">Bathrooms</p>
+            <input
+              type="number"
+              value={formData.bathrooms}
+              className="w-full p-2 border rounded-lg"
+              onChange={(e) => {
+                setFormData({ ...formData, bathrooms: e.target.value });
+              }}
+              min="1"
+            />
+          </div>
         </div>
         <div>
-          <p className="font-semibold mb-2">Bathrooms</p>
-          <input
-            type="number"
-            value={formData.bathrooms}
-            className="w-full p-2 border rounded-lg"
-            onChange={(e) => {
-              setFormData({ ...formData, bathrooms: e.target.value });
-            }}
-            min="1"
-          />
-        </div>
-        <div>
-          <p className="font-semibold mb-2">Location(Near Campus) </p>
+          <p className="font-semibold mb-2">Location(e.g, Near Campus) </p>
           <input
             type="text"
             name="location"
@@ -114,7 +129,7 @@ const CreateListing = () => {
           />
         </div>
         <div>
-          <p className="font-semibold mb-2">Uploead Image</p>
+          <p className="font-semibold mb-2">Upload Image</p>
           <input
             type="file"
             name="image"

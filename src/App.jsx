@@ -27,7 +27,9 @@ const App = () => {
           </Route>
           <Route path="/forgot-password" element={<ForgotPassward />} />
           <Route path="/setup-profile" element={<SetupProfile />} />
-          <Route path="/create-list" element={<CreateListing />} />
+          <Route path="/create-list" element={<PrivateRoutes />}>
+            <Route path="/create-list" element={<CreateListing />} />
+          </Route>
         </Routes>
       </Router>
       <ToastContainer
