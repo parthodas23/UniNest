@@ -1,5 +1,15 @@
 import React, { useState } from "react";
 import Spinner from "../components/Spinner";
+import { toast } from "react-toastify";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import { getAuth } from "firebase/auth";
+import { v4 as uuidv4 } from "uuid";
+import { storage } from "../firebase";
 
 const CreateListing = () => {
   const [geoLocationEnabled, setGeoLocationEnabled] = useState(true);
@@ -12,15 +22,101 @@ const CreateListing = () => {
     bedrooms: "1",
     bathrooms: "1",
     location: "",
-    image: null,
+    images: null,
     description: "",
     latitude: 0,
     longitude: 0,
   });
+  const auth = getAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const apikey = import.meta.env.VITE_GEOCODE_API;
+    let geolocation = {};
+    const { location } = formData;
+    let address;
+
+    try {
+      if (geoLocationEnabled) {
+        const res = await fetch(
+          `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+            location
+          )}&key=${apikey}`
+        );
+
+        const data = await res.json();
+        console.log(data);
+
+        if (data.results.length === 0) {
+          setLoading(false);
+          toast.error("Please Enter a valid address");
+          return;
+        }
+
+        geolocation.lat = data.results[0].geometry.lat;
+        geolocation.lng = data.results[0].geometry.lng;
+        address = data.results[0].formatted;
+
+        console.log(geolocation);
+        console.log(address);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+
+    const storeImage = async (image) => {
+      return new Promise((resolve, reject) => {
+       
+        const filename = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+        const storageRef = ref(storage, filename);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Upload is " + progress + "% done");
+            switch (snapshot.state) {
+              case "paused":
+                console.log("Upload is paused");
+                break;
+              case "running":
+                console.log("Upload is running");
+                break;
+            }
+          },
+          (error) => {
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    };
+
+    let { images } = formData;
+
+    const imgUrls = await Promise.all(
+      [...images].map((image) => storeImage(image))
+    ).catch(() => {
+      setLoading(false);
+      toast.error("Image upload failed");
+      return;
+    });
+
+    console.log(imgUrls);
+    setLoading(false);
   };
 
   if (loading) {
@@ -30,7 +126,7 @@ const CreateListing = () => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-2">
       <h2 className="text-2xl font-bold mb-4">Create Listing</h2>
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <p className="font-semibold mb-2">Listing Title</p>
           <input
@@ -116,11 +212,11 @@ const CreateListing = () => {
           </div>
         </div>
         <div>
-          <p className="font-semibold mb-2">Location(e.g, Near Campus) </p>
+          <p className="font-semibold mb-2">Location</p>
           <input
             type="text"
             name="location"
-            placeholder="e.g.,near campus"
+            placeholder="e.g., near campus,Barishal Univesity"
             value={formData.location}
             className="w-full p-2 border rounded-lg"
             onChange={(e) => {
@@ -134,9 +230,10 @@ const CreateListing = () => {
             type="file"
             name="image"
             accept="image/*"
+            multiple
             className="cursor-pointer bg-gray-400 rounded-lg p-1"
             onChange={(e) => {
-              setFormData({ ...formData, image: e.target.files[0] });
+              setFormData({ ...formData, images: e.target.files });
             }}
           />
         </div>
@@ -155,7 +252,6 @@ const CreateListing = () => {
         <button
           className="w-full bg-green-500 border border-gray-300 p-2 cursor-pointer rounded-lg hover:bg-green-600 text-white"
           type="submit"
-          onSubmit={handleSubmit}
         >
           Submit Listing
         </button>
