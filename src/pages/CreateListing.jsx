@@ -9,14 +9,17 @@ import {
 } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
-import { storage } from "../firebase";
+import { db, storage } from "../firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const CreateListing = () => {
   const [geoLocationEnabled, setGeoLocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
-    type: "Looking for Room",
+    type: "Looking-for-Room",
     roomType: "Single",
     rent: "",
     bedrooms: "1",
@@ -67,48 +70,33 @@ const CreateListing = () => {
       setLoading(false);
     }
 
-    const storeImage = async (image) => {
-      return new Promise((resolve, reject) => {
-       
-        const filename = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
-        const storageRef = ref(storage, filename);
-        const uploadTask = uploadBytesResumable(storageRef, image);
+    const uploadToCloudinary = async (image) => {
+      const data = new FormData();
+      data.append("file", image);
+      data.append("upload_preset", "UniNest"); // e.g. "ml_default"
+      data.append("cloud_name", "dmiscbtu0");
 
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            // Observe state change events such as progress, pause, and resume
-            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log("Upload is " + progress + "% done");
-            switch (snapshot.state) {
-              case "paused":
-                console.log("Upload is paused");
-                break;
-              case "running":
-                console.log("Upload is running");
-                break;
-            }
-          },
-          (error) => {
-            reject(error);
-          },
-          () => {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              resolve(downloadURL);
-            });
+      try {
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/dmiscbtu0/image/upload`,
+          {
+            method: "POST",
+            body: data,
           }
         );
-      });
+
+        const result = await res.json();
+        return result.secure_url; // image URL
+      } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        throw error;
+      }
     };
 
-    let { images } = formData;
+    let { images, ...rest } = formData;
 
     const imgUrls = await Promise.all(
-      [...images].map((image) => storeImage(image))
+      [...images].map((image) => uploadToCloudinary(image))
     ).catch(() => {
       setLoading(false);
       toast.error("Image upload failed");
@@ -116,7 +104,21 @@ const CreateListing = () => {
     });
 
     console.log(imgUrls);
+
+    const formDataCopy = {
+      ...rest,
+      imgUrls,
+      geolocation,
+      address,
+      timeStamp: serverTimestamp(),
+      userRef: auth.currentUser.uid,
+    };
+
+    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
+    delete formDataCopy.images;
     setLoading(false);
+    toast.success("Listing Created.");
+    navigate(`/catagory/${formDataCopy.type}/${docRef.id}`);
   };
 
   if (loading) {
@@ -152,8 +154,8 @@ const CreateListing = () => {
               setFormData({ ...formData, type: e.target.value });
             }}
           >
-            <option value="find">Looking for Room</option>
-            <option value="rent">For Rent</option>
+            <option value="find">Looking-for-Room</option>
+            <option value="rent">For-Rent</option>
           </select>
         </div>
         <div>
@@ -218,6 +220,7 @@ const CreateListing = () => {
             name="location"
             placeholder="e.g., near campus,Barishal Univesity"
             value={formData.location}
+            required
             className="w-full p-2 border rounded-lg"
             onChange={(e) => {
               setFormData({ ...formData, location: e.target.value });
@@ -231,6 +234,7 @@ const CreateListing = () => {
             name="image"
             accept="image/*"
             multiple
+            required
             className="cursor-pointer bg-gray-400 rounded-lg p-1"
             onChange={(e) => {
               setFormData({ ...formData, images: e.target.files });
@@ -243,6 +247,7 @@ const CreateListing = () => {
             name="description"
             className="w-full p-2 border rounded-lg "
             value={formData.description}
+            required
             onChange={(e) => {
               setFormData({ ...formData, description: e.target.value });
             }}
