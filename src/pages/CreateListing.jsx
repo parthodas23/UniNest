@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
@@ -110,7 +104,7 @@ const CreateListing = () => {
       imgUrls,
       geolocation,
       address,
-      timeStamp: serverTimestamp(),
+      timestamp: serverTimestamp(),
       userRef: auth.currentUser.uid,
     };
 
@@ -154,8 +148,8 @@ const CreateListing = () => {
               setFormData({ ...formData, type: e.target.value });
             }}
           >
-            <option value="find">Looking-for-Room</option>
-            <option value="rent">For-Rent</option>
+            <option value="Looking-for-Room">Looking-for-Room</option>
+            <option value="For-Rent">For-Rent</option>
           </select>
         </div>
         <div>

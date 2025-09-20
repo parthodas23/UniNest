@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { db } from "../firebase";
+import ListingsItem from "../components/ListingsItem";
 const Profile = () => {
   const auth = getAuth();
   const [changeDetails, setChangeDetails] = useState(false);
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -70,90 +82,158 @@ const Profile = () => {
     auth.signOut();
     navigate("/");
   };
+
+  useEffect(() => {
+    const fetchUserListings = async () => {
+      try {
+        const listingRef = collection(db, "listings");
+
+        // Try querying by string UID first
+        const q = query(
+          collection(db, "listings"),
+          where("userRef", "==", auth.currentUser.uid),
+          orderBy("timestamp", "desc")
+        );
+
+        let querySnap = await getDocs(q);
+
+        // If nothing found, try querying by Firestore reference
+        if (querySnap.empty) {
+          const userDocRef = doc(db, "users", auth.currentUser.uid);
+          q = query(
+            listingRef,
+            where("userRef", "==", auth.currentUser.uid),
+            orderBy("timestamp", "desc")
+          );
+          querySnap = await getDocs(q);
+        }
+
+        const listingsArray = querySnap.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }));
+
+        setListings(listingsArray);
+        setLoading(false);
+
+        console.log("Fetched Listings:", listingsArray);
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to fetch listings.");
+      }
+    };
+
+    if (auth.currentUser?.uid) fetchUserListings();
+  }, [auth]);
+  console.log(listings);
   return (
-    <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
-      <h1 className="text-3xl font-semibold mt-6 text-center">My Profile</h1>
-      <div className="w-full md:w-[40%] mt-6 px-3">
-        <form>
-          <input
-            id="name"
-            className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
-              changeDetails && "bg-purple-300"
-            }`}
-            type="text"
-            value={name}
-            onChange={onChange}
-            disabled={!changeDetails}
-          />
-          <input
-            id="email"
-            className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6`}
-            type="email"
-            value={email}
-            onChange={onChange}
-            disabled={!changeDetails}
-          />
-          <input
-            id="university"
-            className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
-              changeDetails && "bg-purple-300"
-            }`}
-            type="text"
-            value={university}
-            onChange={onChange}
-            disabled={!changeDetails}
-          />
-          <input
-            id="city"
-            className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
-              changeDetails && "bg-purple-300"
-            }`}
-            type="text"
-            value={city}
-            onChange={onChange}
-            disabled={!changeDetails}
-          />
-          <input
-            id="year"
-            className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
-              changeDetails && "bg-purple-300"
-            }`}
-            type="text"
-            value={year}
-            onChange={onChange}
-            disabled={!changeDetails}
-          />
+    <>
+      <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
+        <h1 className="text-3xl font-semibold mt-6 text-center">My Profile</h1>
+        <div className="w-full md:w-[40%] mt-6 px-3">
+          <form>
+            <input
+              id="name"
+              className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
+                changeDetails && "bg-purple-300"
+              }`}
+              type="text"
+              value={name}
+              onChange={onChange}
+              disabled={!changeDetails}
+            />
+            <input
+              id="email"
+              className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6`}
+              type="email"
+              value={email}
+              onChange={onChange}
+              disabled={!changeDetails}
+            />
+            {/* <input
+              id="university"
+              className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
+                changeDetails && "bg-purple-300"
+              }`}
+              type="text"
+              value={university}
+              onChange={onChange}
+              disabled={!changeDetails}
+            />
+            <input
+              id="city"
+              className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
+                changeDetails && "bg-purple-300"
+              }`}
+              type="text"
+              value={city}
+              onChange={onChange}
+              disabled={!changeDetails}
+            />
+            <input
+              id="year"
+              className={`bg-pink-100 w-full rounded-xl py-2 px-4 border border-gray-300 mb-6 ${
+                changeDetails && "bg-purple-300"
+              }`}
+              type="text"
+              value={year}
+              onChange={onChange}
+              disabled={!changeDetails}
+            /> */}
 
-          <div className="flex justify-between whitespace-nowrap mt-2">
-            <p className="flex items-center">
-              Do you want to change your details?{" "}
-              <span
-                onClick={() => {
-                  changeDetails && onsubmit();
-                  setChangeDetails((prev) => !prev);
-                }}
-                className="text-amber-600 ml-2 hover:text-amber-900 cursor-pointer font-semibold"
+            <div className="flex justify-between whitespace-nowrap mt-2">
+              <p className="flex items-center">
+                Do you want to change your details?{" "}
+                <span
+                  onClick={() => {
+                    changeDetails && onsubmit();
+                    setChangeDetails((prev) => !prev);
+                  }}
+                  className="text-amber-600 ml-2 hover:text-amber-900 cursor-pointer font-semibold"
+                >
+                  {changeDetails ? "Change" : "Edit"}
+                </span>
+              </p>
+              <p
+                onClick={onLogout}
+                className="text-blue-500 hover:text-blue-700 cursor-pointer font-semibold"
               >
-                {changeDetails ? "Change" : "Edit"}
-              </span>
-            </p>
-            <p
-              onClick={onLogout}
-              className="text-blue-500 hover:text-blue-700 cursor-pointer font-semibold"
-            >
-              Sign Out
-            </p>
-          </div>
-        </form>
+                Sign Out
+              </p>
+            </div>
+          </form>
 
-        <button
-          className="p-2 w-full bg-blue-400 rounded-2xl mt-3 cursor-pointer hover:bg-blue-500"
-          type="submit"
-        >
-          <Link to="/create-list">Find Or Rent Your Home</Link>
-        </button>
+          <button
+            className="p-2 w-full bg-blue-400 rounded-2xl mt-3 cursor-pointer hover:bg-blue-500"
+            type="submit"
+          >
+            <Link to="/create-list">Find Or Rent Your Home</Link>
+          </button>
+        </div>
+      </section>
+      <div className="max-w-6xl px-7 mt-6 mx-auth">
+        {!loading ? (
+          listings.length > 0 ? (
+            <>
+              <h2 className="text-2xl text-center font-semibold">
+                My Listings
+              </h2>
+              <ul>
+                {listings.map((listing) => (
+                  <ListingsItem
+                    key={listing.id}
+                    id={listing.id}
+                    listing={listing.data}
+                  />
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="text-center text-gray-500">No listings found</p>
+          )
+        ) : null}
       </div>
-    </section>
+    </>
   );
 };
 
