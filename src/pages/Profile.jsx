@@ -88,7 +88,6 @@ const Profile = () => {
       try {
         const listingRef = collection(db, "listings");
 
-        // Try querying by string UID first
         const q = query(
           collection(db, "listings"),
           where("userRef", "==", auth.currentUser.uid),
@@ -125,7 +124,6 @@ const Profile = () => {
 
     if (auth.currentUser?.uid) fetchUserListings();
   }, [auth]);
-  console.log(listings);
   return (
     <>
       <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
@@ -215,10 +213,10 @@ const Profile = () => {
         {!loading ? (
           listings.length > 0 ? (
             <>
-              <h2 className="text-2xl text-center font-semibold">
+              <h2 className="text-2xl text-center font-semibold mb-4">
                 My Listings
               </h2>
-              <ul>
+              <ul className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {listings.map((listing) => (
                   <ListingsItem
                     key={listing.id}
