@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -124,6 +125,20 @@ const Profile = () => {
 
     if (auth.currentUser?.uid) fetchUserListings();
   }, [auth]);
+
+  const onDelete = async (lisingsId) => {
+    if (window.confirm("Are you sure you want to delete?")) {
+      await deleteDoc(doc(db, "listings", lisingsId));
+      const updateListings = listings.filter(
+        (listing) => listing.id !== lisingsId
+      );
+      setListings(updateListings);
+      toast.success("Succesfully deleted the listing.");
+    }
+  };
+  const onEdit = (lisingsId) => {
+    navigate(`/edit-listings/${lisingsId}`);
+  };
   return (
     <>
       <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
@@ -222,6 +237,8 @@ const Profile = () => {
                     key={listing.id}
                     id={listing.id}
                     listing={listing.data}
+                    onDelete={() => onDelete(listing.id)}
+                    onEdit={() => onEdit(listing.id)}
                   />
                 ))}
               </ul>

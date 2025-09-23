@@ -2,7 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { MdLocationOn } from "react-icons/md";
-const ListingsItem = ({ listing, id }) => {
+import { FaTrash } from "react-icons/fa6";
+import { MdEdit } from "react-icons/md";
+
+const ListingsItem = ({ listing, id, onEdit, onDelete }) => {
   return (
     <li className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-200 overflow-hidden">
       <Link to={`category/${listing.type}/${listing.id}`}>
@@ -37,14 +40,26 @@ const ListingsItem = ({ listing, id }) => {
             <p>
               {listing.bathrooms > 1 ? `${listing.bathrooms} Baths` : "1 Bath"}
             </p>
-            <p>
+            {/* <p>
               {listing.roomType === "Single" || "Shared"
                 ? `${listing.roomType} Room`
                 : `${listing.roomType}`}
-            </p>
+            </p> */}
           </div>
         </div>
       </Link>
+      {onDelete && (
+        <FaTrash
+          className="absolute bottom-3 right-4 h-[14px] cursor-pointer hover:h-[20px]"
+          onClick={() => onDelete(listing.id)}
+        />
+      )}
+      {onEdit && (
+        <MdEdit
+          className="absolute right-13 bottom-3 h-[15px] cursor-pointer hover:h-[23px]"
+          onClick={() => onEdit(listing.id)}
+        />
+      )}
     </li>
   );
 };
