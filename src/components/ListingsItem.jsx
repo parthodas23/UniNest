@@ -13,7 +13,7 @@ const ListingsItem = ({ listing, id, onEdit, onDelete }) => {
           <img
             className="h-48 w-full object-cover hover:scale-105 transition-transform duration-300"
             loading="lazy"
-            src={listing.imgUrls}
+            src={listing.imgUrls && listing.imgUrls[listing.imgUrls.length - 1]}
           />
           <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium rounded-lg px-2 py-1 shadow-md ">
             {formatDistanceToNow(listing.timestamp.toDate(), {

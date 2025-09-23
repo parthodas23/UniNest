@@ -11,6 +11,7 @@ import PrivateRoutes from "./components/PrivateRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
 import SetupProfile from "./pages/SetupProfile";
 import CreateListing from "./pages/CreateListing";
+import EditListings from "./pages/EditListings";
 
 const App = () => {
   return (
@@ -29,6 +30,12 @@ const App = () => {
           <Route path="/setup-profile" element={<SetupProfile />} />
           <Route path="/create-list" element={<PrivateRoutes />}>
             <Route path="/create-list" element={<CreateListing />} />
+          </Route>
+          <Route path="/edit-listings" element={<PrivateRoutes />}>
+            <Route
+              path="/edit-listings/:listingId"
+              element={<EditListings />}
+            />
           </Route>
         </Routes>
       </Router>

@@ -136,8 +136,8 @@ const Profile = () => {
       toast.success("Succesfully deleted the listing.");
     }
   };
-  const onEdit = (lisingsId) => {
-    navigate(`/edit-listings/${lisingsId}`);
+  const onEdit = (listingId) => {
+    navigate(`/edit-listings/${listingId}`);
   };
   return (
     <>
