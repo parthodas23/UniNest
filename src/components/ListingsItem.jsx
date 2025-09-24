@@ -8,7 +8,7 @@ import { MdEdit } from "react-icons/md";
 const ListingsItem = ({ listing, id, onEdit, onDelete }) => {
   return (
     <li className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-200 overflow-hidden">
-      <Link to={`category/${listing.type}/${listing.id}`}>
+      <Link to={`/category/${listing.type}/${id}`}>
         <div className="relative">
           <img
             className="h-48 w-full object-cover hover:scale-105 transition-transform duration-300"

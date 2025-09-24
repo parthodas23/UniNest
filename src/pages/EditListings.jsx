@@ -57,7 +57,7 @@ const EditListings = () => {
   }, [listingId, navigate]);
   useEffect(() => {
     if (listing && listing.userRef !== auth.currentUser.uid) {
-      toast.error("You ca't edit this listing");
+      toast.error("You can't edit this listing");
       navigate("/");
     }
   }, [auth.currentUser.uid,navigate,listing]);

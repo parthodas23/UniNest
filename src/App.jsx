@@ -12,6 +12,7 @@ import { ToastContainer, Bounce } from "react-toastify";
 import SetupProfile from "./pages/SetupProfile";
 import CreateListing from "./pages/CreateListing";
 import EditListings from "./pages/EditListings";
+import Listing from "./pages/Listing";
 
 const App = () => {
   return (
@@ -23,6 +24,10 @@ const App = () => {
           <Route path="/signin" element={<SingIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/list-room" element={<ListRoom />} />
+          <Route
+            path="/category/:categoryName/:listingId"
+            element={<Listing />}
+          />
           <Route path="/profile" element={<PrivateRoutes />}>
             <Route path="/profile" element={<Profile />} />
           </Route>
