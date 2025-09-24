@@ -6,11 +6,13 @@ import Spinner from "../components/Spinner";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
 import "swiper/css/bundle";
+import { FaShareFromSquare } from "react-icons/fa6";
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const { listingId } = useParams();
+  const [shareLinkedCopied, setShareLinkedCopied] = useState(false);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -51,6 +53,19 @@ const Listing = () => {
             </SwiperSlide>
           ))}
       </Swiper>
+      <div
+        className="fixed top-[13%] right-[3%] z-10 text-2xl p-2 rounded-full text-gray-200 bg-gray-600  cursor-pointer flex justify-center items-center z-10"
+        onClick={() => {
+          navigator.clipboard.writeText(window.location.href);
+          setShareLinkedCopied(true);
+          setTimeout(() => {
+            setShareLinkedCopied(false);
+          }, 2000);
+        }}
+      >
+        <FaShareFromSquare />
+      </div>
+      {shareLinkedCopied && <p className="fixed top-[20%] right-[1%] text-gray-200 rounded-xl p-1 bg-gray-500 z-10">Link Copied!</p>}
     </main>
   );
 };
