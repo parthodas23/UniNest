@@ -10,12 +10,15 @@ import { FaShareFromSquare } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaBed } from "react-icons/fa";
 import { FaBath } from "react-icons/fa6";
-
+import { getAuth } from "firebase/auth";
+import Contact from "../components/Contact";
 const Listing = () => {
+  const [contactLandlord, setContactLandlord] = useState(false);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const { listingId } = useParams();
   const [shareLinkedCopied, setShareLinkedCopied] = useState(false);
+  const auth = getAuth();
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -57,7 +60,7 @@ const Listing = () => {
           ))}
       </Swiper>
       <div
-        className="fixed top-[13%] right-[3%] z-10 text-2xl p-2 rounded-full text-gray-200 bg-gray-600  cursor-pointer flex justify-center items-center z-10"
+        className="fixed top-[13%] right-[3%] text-2xl p-2 rounded-full text-gray-200 bg-gray-600  cursor-pointer flex justify-center items-center z-10"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           setShareLinkedCopied(true);
@@ -73,8 +76,8 @@ const Listing = () => {
           Link Copied!
         </p>
       )}
-      <div className="m-4 flex flex-col md:flex-row max-w-6xl lg:mx-auto p-4 rounded-2xl shadow-md lg:space-x-4 z-10 overflow-x-hidden">
-        <div className="bg-gray-200 w-full h-[200px] lg-[400px] rounded-xl p-2">
+      <div className="m-4 flex flex-col md:flex-row max-w-6xl lg:mx-auto rounded-2xl shadow-md lg:space-x-4 z-10 overflow-x-hidden">
+        <div className="bg-gray-200 w-full rounded-xl p-2">
           <p className="text-2xl font-bold mb-3 text-gray-600">
             {listing.title} - {listing.rent}(tk)
           </p>
@@ -99,7 +102,7 @@ const Listing = () => {
             <span className="font-semibold">Description -</span>{" "}
             {listing.description}
           </p>
-          <ul className="flex justify-start space-x-10">
+          <ul className="flex justify-start space-x-10 mb-5">
             <li className="flex items-center font-semibold mt-3 whitespace-nowrap">
               <FaBed className="text-lg mr-2" />
               {+listing.bedrooms > 1 ? `${listing.bedrooms} Beds` : "1 Bed"}
@@ -109,6 +112,19 @@ const Listing = () => {
               {+listing.bathrooms > 1 ? `${listing.bedrooms} Baths` : "1 Bath"}
             </li>
           </ul>
+          {contactLandlord && (
+            <Contact userRef={listing.userRef} listing={listing} />
+          )}
+          {listing.userRef !== auth.currentUser?.uid && !contactLandlord && (
+            <div className="mt-6">
+              <button
+                onClick={() => setContactLandlord(true)}
+                className="px-7 py-3 bg-purple-400 text-gray-200 font-medium rounded-2xl text-sm shadow-md hover:bg-purple-600 cursor-pointer hover:shadow-lg w-full"
+              >
+                Contact LandLord
+              </button>
+            </div>
+          )}
         </div>
         <div className="bg-blue-300 w-full h-[200px] lgh-[400px]"></div>
       </div>
