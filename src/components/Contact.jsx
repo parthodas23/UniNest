@@ -6,9 +6,7 @@ import { toast } from "react-toastify";
 const Contact = ({ userRef, listing }) => {
   const [landLord, setLandLord] = useState(null);
   const [message, setMessage] = useState("");
-  const onChange = (e) => {
-    setMessage(e.target.value);
-  };
+  
   useEffect(() => {
     const getLandLord = async () => {
       const docRef = doc(db, "users", userRef);
@@ -21,6 +19,7 @@ const Contact = ({ userRef, listing }) => {
     };
     getLandLord();
   }, [userRef]);
+
   return (
     <>
       {landLord !== null && (
@@ -41,7 +40,6 @@ const Contact = ({ userRef, listing }) => {
           <a
             href={`mailto:${landLord.email}?Subject=${listing.title}&body=${message}`}
           >
-            {" "}
             <button className=" mt-3 cursor-pointer px-7 py-2 bg-blue-300 rounded w-full hover:bg-blue-500 shadow-md">
               Send Message
             </button>

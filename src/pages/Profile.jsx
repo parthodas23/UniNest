@@ -126,7 +126,7 @@ const Profile = () => {
     if (auth.currentUser?.uid) fetchUserListings();
   }, [auth]);
 
-  const onDelete = async (lisingsId) => {
+   const onDelete = async (lisingsId) => {
     if (window.confirm("Are you sure you want to delete?")) {
       await deleteDoc(doc(db, "listings", lisingsId));
       const updateListings = listings.filter(
