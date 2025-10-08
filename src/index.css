@@ -3,3 +3,11 @@
 body {
   background-color: #e2e8f0;
 }
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scrollbar-width: none;
+}

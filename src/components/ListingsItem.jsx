@@ -4,8 +4,10 @@ import { formatDistanceToNow } from "date-fns";
 import { MdLocationOn } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
 import { MdEdit } from "react-icons/md";
+import { getAuth } from "firebase/auth";
 
 const ListingsItem = ({ listing, id, onEdit, onDelete }) => {
+  const auth=getAuth()
   return (
     <li className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-200 overflow-hidden">
       <Link to={`/category/${listing.type}/${id}`}>
@@ -47,7 +49,7 @@ const ListingsItem = ({ listing, id, onEdit, onDelete }) => {
             </p> */}
           </div>
         </div>
-      </Link>
+      </Link> 
       {onDelete && (
         <FaTrash
           className="absolute bottom-3 right-4 h-[14px] cursor-pointer hover:h-[20px]"
