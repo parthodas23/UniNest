@@ -62,7 +62,12 @@ const Slider = () => {
                   backgroundSize: "cover",
                 }}
               ></div>
-              <p className="absolute text-red-800 left-1 top-3 font-bold">{listing.data.title}</p>
+              <p className="absolute text-white left-1 top-3 font-medium bg-blue-500 rounded-br-2xl p-1 ">
+                {listing.data.title}
+              </p>
+              <p className="absolute text-white left-1 bottom-1 font-semibold bg-green-600 rounded-tl-2xl p-2 ">
+                {`${listing.data.rent} /month`}
+              </p>
             </SwiperSlide>
           ))}
         </Swiper>
