@@ -224,7 +224,7 @@ const Profile = () => {
           </button>
         </div>
       </section>
-      <div className="max-w-6xl px-7 mt-6 mx-auth">
+      <div className="max-w-6xl px-7 mt-6 mx-auto">
         {!loading ? (
           listings.length > 0 ? (
             <>

@@ -46,7 +46,7 @@ const Home = () => {
           listingRef,
           where("type", "==", "For-Rent"),
           orderBy("timestamp", "desc"),
-          limit(10)
+          limit(9)
         );
         const querySnap = await getDocs(q);
         const listing = [];
@@ -145,7 +145,9 @@ const Home = () => {
         )}
         {lookingListings && (
           <div className="m-2 mb-6">
-            <h2 className="font-semibold px-3 text-2xl mt-4">Looking for Room</h2>
+            <h2 className="font-semibold px-3 text-2xl mt-4">
+              Looking for Room
+            </h2>
 
             <Link to="/category/Looking-for-Room">
               <p className="px-3 text-sm text-blue-500 font-medium cursor-pointer">
