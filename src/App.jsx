@@ -13,6 +13,7 @@ import SetupProfile from "./pages/SetupProfile";
 import CreateListing from "./pages/CreateListing";
 import EditListings from "./pages/EditListings";
 import Listing from "./pages/Listing";
+import Category from "./pages/Category";
 
 const App = () => {
   return (
@@ -42,6 +43,10 @@ const App = () => {
               element={<EditListings />}
             />
           </Route>
+          <Route
+            path="/category/:categoryName"
+            element={<Category />}
+          />
         </Routes>
       </Router>
       <ToastContainer
